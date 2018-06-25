@@ -64,6 +64,8 @@ static void CPUMeter_updateValues(Meter* this, char* buffer, int size) {
    memset(this->values, 0, sizeof(double) * CPU_METER_ITEMCOUNT);
    double percent = Platform_setCPUValues(this, cpu);
    snprintf(buffer, size, "%5.1f%%", percent);
+   if (this->values[CPU_METER_CPUFREQ])
+      snprintf(buffer, size, "%s/%5.3f GHz", buffer, this->values[CPU_METER_CPUFREQ]);
 }
 
 static void CPUMeter_display(Object* cast, RichString* out) {
@@ -115,6 +117,11 @@ static void CPUMeter_display(Object* cast, RichString* out) {
          RichString_append(out, CRT_colors[METER_TEXT], "vir:");
          RichString_append(out, CRT_colors[CPU_GUEST], buffer);
       }
+   }
+   if (this->values[CPU_METER_CPUFREQ]) {
+      sprintf(buffer, "%6.3f GHz ", this->values[CPU_METER_CPUFREQ]);
+      RichString_append(out, CRT_colors[METER_TEXT], "freq:");
+      RichString_append(out, CRT_colors[CPU_NORMAL], buffer);
    }
 }
 

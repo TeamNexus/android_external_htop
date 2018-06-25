@@ -190,6 +190,7 @@ double Platform_setCPUValues(Meter* this, int cpu) {
       Meter_setItems(this, 4);
       percent = v[0]+v[1]+v[2]+v[3];
    }
+   v[CPU_METER_CPUFREQ] = cpuData->scalingFreq / 1000000.0; // KHz -> GHz
    percent = CLAMP(percent, 0.0, 100.0);
    if (isnan(percent)) percent = 0.0;
    return percent;

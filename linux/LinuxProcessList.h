@@ -38,6 +38,8 @@ typedef struct CPUData_ {
    unsigned long long int softIrqPeriod;
    unsigned long long int stealPeriod;
    unsigned long long int guestPeriod;
+
+   unsigned long long int scalingFreq;
 } CPUData;
 
 typedef struct LinuxProcessList_ {

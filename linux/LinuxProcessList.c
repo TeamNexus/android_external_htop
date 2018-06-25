@@ -695,10 +695,12 @@ static inline double LinuxProcessList_scanCPUTime(LinuxProcessList* this) {
    if (file == NULL) {
       CRT_fatalError("Cannot open " PROCSTATFILE);
    }
+   FILE *cpufile;
    int cpus = this->super.cpuCount;
    assert(cpus > 0);
    for (int i = 0; i <= cpus; i++) {
       char buffer[PROC_LINE_LENGTH + 1];
+      char pathbuf[PATH_MAX + 1];
       unsigned long long int usertime, nicetime, systemtime, idletime;
       unsigned long long int ioWait, irq, softIrq, steal, guest, guestnice;
       ioWait = irq = softIrq = steal = guest = guestnice = 0;
@@ -753,6 +755,16 @@ static inline double LinuxProcessList_scanCPUTime(LinuxProcessList* this) {
       cpuData->stealTime = steal;
       cpuData->guestTime = virtalltime;
       cpuData->totalTime = totaltime;
+      // read current scaling frequency (if not average)
+      if (i != 0) {
+         sprintf(pathbuf, "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", i - 1);
+         cpufile = fopen(pathbuf, "r");
+         if (cpufile == NULL) {
+            CRT_fatalError("Cannot open scaling_cur_freq");
+         }
+         fscanf(cpufile, "%lld", &cpuData->scalingFreq);
+         fclose(cpufile);
+      }
    }
    double period = (double)this->cpus[0].totalPeriod / cpus;
    fclose(file);
